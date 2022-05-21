@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const accountController = require("../controller/account.controller.js");
+const auth = require("../controller/auth");
 
 router.post(
     "/",
@@ -11,7 +12,7 @@ router.post(
 
 router.put(
   "/",
-  // auth,
+  auth,
   // AccountValidator.updateAccount,
   // ErrorValidator.ifErrors,
   accountController.updateAccount

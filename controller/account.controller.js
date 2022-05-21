@@ -1,6 +1,11 @@
+const jwt = require("jsonwebtoken");
 const db = require("../models");
 const Account = db.account;
 
+const jwtSecret = "MYDIRTYLITTLESECRET";
+function createToken (id, email) {
+  return jwt.sign({ id: id, email: email }, jwtSecret);
+};
 
 exports.createAccount = (req, res) => {
 
@@ -14,9 +19,11 @@ exports.createAccount = (req, res) => {
     account
       .save(account)
       .then(accountInfo => {
+        let token = createToken(accountInfo._id, accountInfo.email);
+        
         return res.status(200).json({
             message: "Account successfully created",
-            data: { account: accountInfo },
+            data: { token: token, account: accountInfo },
           });
       })
       .catch(err => {
@@ -68,22 +75,24 @@ exports.updateAccount = (req, res) => {
 exports.login = (req, res) => {
   let username = req.body.username;
 
-  var account = Account.findOne({ username: username }, function (err, obj) {
+  var account = Account.findOne({ username: username }, function (err, accountInfo) {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong! Error: " + err.message,
         data: {},
       });
-    } else if (!obj) {
+    } else if (!accountInfo) {
       return res.status(500).json({
         message: "No such account found.",
         data: {},
       });
     } else {
-      if (req.body.password == obj.password) {
+      if (req.body.password == accountInfo.password) {
+        let token = createToken(accountInfo._id, accountInfo.email);
+
         return res.status(200).json({
           message: "You have successfully sign in!",
-          data: { account: obj },
+          data: { token: token, account: accountInfo },
         });
       } else {
         return res.status(400).json({
