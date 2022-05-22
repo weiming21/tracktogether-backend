@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-// const env = require("../config/env");
-const jwtSecret = "MYDIRTYLITTLESECRET";
+const env = require("../config/env");
+const jwtSecret = env.jwtSecret;
 
 module.exports = function (req, res, next) {
   try {

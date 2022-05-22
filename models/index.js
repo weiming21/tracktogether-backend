@@ -1,4 +1,6 @@
-const url = "mongodb+srv://tracktogether5279:P%40ssw0rd5279tracktogether@cluster0.4svrt.mongodb.net/tracktogether?retryWrites=true&w=majority";
+
+const env = require("../config/env");
+const url = env.dbLink;
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 

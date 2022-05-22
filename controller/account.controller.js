@@ -1,8 +1,9 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
+const env = require("../config/env");
 const Account = db.account;
 
-const jwtSecret = "MYDIRTYLITTLESECRET";
+const jwtSecret = db.jwtSecret;
 function createToken (id, email) {
   return jwt.sign({ id: id, email: email }, jwtSecret);
 };
