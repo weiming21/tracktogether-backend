@@ -4,6 +4,8 @@ module.exports = (mongoose) => {
         email: String,
         contact: Number,
         password: String,
+        transactions: Array,
+        pending: Array
     },
     { timestamps: true });
     const Account = mongoose.model('user', accountSchema);

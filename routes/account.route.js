@@ -18,13 +18,24 @@ router.put(
   accountController.updateAccount
 );
   
-  router.post(
-    "/login",
-    // AccountValidator.login,
-    // ErrorValidator.ifErrors,
-    accountController.login
-  );
+router.post(
+  "/login",
+  // AccountValidator.login,
+  // ErrorValidator.ifErrors,
+  accountController.login
+);
 
   
+router.get(
+  "/:id",
+  accountController.retrieveTransactions
+)
+
+router.put(
+  "/:id",
+  // AccountValidator.login,
+  // ErrorValidator.ifErrors,
+  accountController.addTransactions
+);
 
 module.exports = router;

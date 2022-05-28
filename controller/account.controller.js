@@ -105,3 +105,66 @@ exports.login = (req, res) => {
     }
   );
 };
+
+exports.retrieveTransactions = (req, res) => {
+  const id = req.params.id;
+  Account.findById(id)
+    .then(data => {
+      if (!data)
+        res.status(404).send({ message: "No user found with id " + id });
+      else res.send(data.transactions);
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .send({ message: "Error retrieving transactions with id=" + id });
+    });
+};
+
+exports.addTransactions = (req, res) => {
+  const id = req.params.id;
+  const newData = req.body;
+
+  // Account.findOneAndUpdate( {_id: id}, 
+  //   { $push: {transactions: newData} } )
+  //   .then(data => {
+  //     if (!data)
+  //       res.status(404).send({ message: "No user found with id " + id });
+  //     else res.send(data.transactions);
+  //   })
+  //   .catch(err => {
+  //     res
+  //       .status(500)
+  //       .send({ message: "Error adding transactions with id=" + id });
+  //   });
+
+  var account = Account.findById(id, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such user found.",
+        data: {},
+      });
+    } else {
+      obj.transactions.push(newData);
+      obj
+        .save(obj)
+        .then((accountInfo) => {
+          return res.status(200).json({
+            message: "Transactions added successfully",
+            data: { account: accountInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
+};
