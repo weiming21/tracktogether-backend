@@ -4,11 +4,11 @@ const accountController = require("../controller/account.controller.js");
 const auth = require("../controller/auth");
 
 router.post(
-    "/",
-    // AccountValidator.createAccount,
-    // ErrorValidator.ifErrors,
-    accountController.createAccount
-  );
+  "/",
+  // AccountValidator.createAccount,
+  // ErrorValidator.ifErrors,
+  accountController.createAccount
+);
 
 router.put(
   "/",
@@ -17,7 +17,9 @@ router.put(
   // ErrorValidator.ifErrors,
   accountController.updateAccount
 );
-  
+
+router.get("/refresh", auth, accountController.refresh);
+
 router.post(
   "/login",
   // AccountValidator.login,
@@ -25,11 +27,7 @@ router.post(
   accountController.login
 );
 
-  
-router.get(
-  "/:id",
-  accountController.retrieveTransactions
-)
+router.get("/:id", accountController.retrieveTransactions);
 
 router.put(
   "/:id",

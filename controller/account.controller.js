@@ -106,15 +106,32 @@ exports.login = (req, res) => {
   );
 };
 
+exports.refresh = (req, res) => {
+  let _id = req.body._id;
+  var account = Account.findOne({ _id: _id }, function (err, accountInfo) {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else {
+      return res.status(200).json({
+        message: "Refreshed login status",
+        data: { account: accountInfo },
+      });
+    }
+  });
+};
+
 exports.retrieveTransactions = (req, res) => {
   const id = req.params.id;
   Account.findById(id)
-    .then(data => {
+    .then((data) => {
       if (!data)
         res.status(404).send({ message: "No user found with id " + id });
       else res.send(data.transactions);
     })
-    .catch(err => {
+    .catch((err) => {
       res
         .status(500)
         .send({ message: "Error retrieving transactions with id=" + id });
@@ -125,7 +142,7 @@ exports.addTransactions = (req, res) => {
   const id = req.params.id;
   const newData = req.body;
 
-  // Account.findOneAndUpdate( {_id: id}, 
+  // Account.findOneAndUpdate( {_id: id},
   //   { $push: {transactions: newData} } )
   //   .then(data => {
   //     if (!data)
