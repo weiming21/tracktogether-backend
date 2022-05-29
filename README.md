@@ -19,4 +19,5 @@ We envision TrackTogether as a user-friendly automated expense tracker that **ab
 ![programme flow and design](https://user-images.githubusercontent.com/92814312/170858061-ab29c1a4-bc1a-4b53-ba84-054bb6572c11.png)
 
 Full documentation for this project can be found [here](https://docs.google.com/document/d/1pxaldj-d10qNYUETtGEqeoQ6UXYIdUXOeuk6gmx6fY4/edit?usp=sharing).
+
 Github Repo [link](https://github.com/weiming21/tracktogether-fronted) to frontend
