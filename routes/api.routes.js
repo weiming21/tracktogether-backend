@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const accountRouter = require("./account.route");
-// const itemRouter = require("./item.route");
+const chartRouter = require("./chart.route");
 router.use("/account", accountRouter);
-// router.use("/item", itemRouter);
+router.use("/chart", chartRouter);
 
 module.exports = router;
