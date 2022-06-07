@@ -140,7 +140,6 @@ exports.uploadImage = (req, res) => {
   });
 };
 
-
 exports.refresh = (req, res) => {
   let _id = req.body._id;
   var account = Account.findOne({ _id: _id }, function (err, accountInfo) {

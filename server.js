@@ -1,6 +1,6 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 // const fileUpload = require('express-fileupload');
 
@@ -15,31 +15,29 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = require("./models");
 const Account = db.account;
 
-const connectionParams={
-    useNewUrlParser: true,
-    // useCreateIndex: true,
-    useUnifiedTopology: true 
-}
+const connectionParams = {
+  useNewUrlParser: true,
+  // useCreateIndex: true,
+  useUnifiedTopology: true,
+};
 
 db.mongoose
-    .connect(db.url,connectionParams)
-    .then( () => {
-        console.log('Connected to the database ')
-    })
-    .catch( (err) => {
-        console.error(`Error connecting to the database. n${err}`);
-    })
+  .connect(db.url, connectionParams)
+  .then(() => {
+    console.log("Connected to the database ");
+  })
+  .catch((err) => {
+    console.error(`Error connecting to the database. n${err}`);
+  });
 
-app.use('/api', apiRouter);
-    
-app.get('/', (req,res) => {
-    res.send("Hello world");
+app.use("/api", apiRouter);
+
+app.get("/", (req, res) => {
+  res.send("Hello world");
 });
 
 // app.get('/api', )
 
-
-
-app.listen(8080,() => {
-    console.log('Server started on port 8080...');
-})
+app.listen(8080, () => {
+  console.log("Server started on port 8080...");
+});
