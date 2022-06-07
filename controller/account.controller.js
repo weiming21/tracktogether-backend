@@ -106,6 +106,41 @@ exports.login = (req, res) => {
   );
 };
 
+exports.uploadImage = (req, res) => {
+  let uniqueID = req.body._id;
+
+  var account = Account.findOne({ _id: uniqueID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such account found.",
+        data: {},
+      });
+    } else {
+      obj.image = req.body.image;
+      obj
+        .save(obj)
+        .then((accountInfo) => {
+          return res.status(200).json({
+            message: "Image successfully uploaded/changed.",
+            data: { account: accountInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
+};
+
+
 exports.refresh = (req, res) => {
   let _id = req.body._id;
   var account = Account.findOne({ _id: _id }, function (err, accountInfo) {

@@ -27,6 +27,8 @@ router.post(
   accountController.login
 );
 
+router.put("/upload", auth, accountController.uploadImage);
+
 router.get("/:id", accountController.retrieveTransactions);
 
 router.put(

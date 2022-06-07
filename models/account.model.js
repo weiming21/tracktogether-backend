@@ -4,6 +4,7 @@ module.exports = (mongoose) => {
         email: String,
         contact: Number,
         password: String,
+        image: String,
         transactions: Array,
         pending: Array
     },
