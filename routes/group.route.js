@@ -19,4 +19,6 @@ router.put(
 
 router.get("/summary/:username", groupController.displayGroups);
 
+router.put("/join", groupController.joinGroup);
+
 module.exports = router;

@@ -88,3 +88,38 @@ exports.displayGroups = (req, res) => {
         .send({ message: "Error retrieving transactions with id=" + id });
     });
 };
+
+exports.joinGroup = (req, res) => {
+  const groupID = req.body.groupID;
+  const username = req.body.username;
+  Group.findOne({ groupID: groupID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such account found.",
+        data: {},
+      });
+    } else {
+      let newUser = { username: username, amount: 0 };
+      obj.users.push(newUser);
+      obj
+        .save(obj)
+        .then((groupInfo) => {
+          return res.status(200).json({
+            message: "Account profile successfully updated.",
+            data: { group: groupInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
+};
