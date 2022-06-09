@@ -17,8 +17,29 @@ router.put(
   groupController.updateGroup
 );
 
-router.get("/summary/:username", groupController.displayGroups);
+router.post("/summary/:username", groupController.displayGroups);
 
 router.put("/join", groupController.joinGroup);
+
+router.post(
+  "/initiatePayment",
+  // AccountValidator.updateAccount,
+  // ErrorValidator.ifErrors,
+  groupController.initiatePayment
+);
+
+router.post(
+  "/resetPayment",
+  // AccountValidator.updateAccount,
+  // ErrorValidator.ifErrors,
+  groupController.resetPayments
+);
+
+router.post(
+  "/acknowledgePayment",
+  // AccountValidator.updateAccount,
+  // ErrorValidator.ifErrors,
+  groupController.acknowledgePayment
+);
 
 module.exports = router;

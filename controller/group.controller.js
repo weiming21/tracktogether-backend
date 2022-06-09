@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
 const env = require("../config/env");
+const HelperFunction = require("./helper.controller");
 const Group = db.group;
 
 // const jwtSecret = env.jwtSecret;
@@ -13,9 +14,9 @@ exports.createGroup = (req, res) => {
     .sort({ groupID: -1 })
     .limit(1)
     .then(function (result) {
-      console.log(result);
+      // console.log(result);
       let newID = result.length != 0 ? result[0].groupID + 1 : 1;
-      console.log(newID);
+      // console.log(newID);
       const group = new Group({
         groupID: newID,
         name: req.body.name,
@@ -77,10 +78,14 @@ exports.updateGroup = (req, res) => {
 };
 
 exports.displayGroups = (req, res) => {
-  const username = req.params.username;
+  const username = req.body.username;
   Group.find({ users: { $elemMatch: { username: username } } })
     .then((data) => {
-      res.send(data);
+      console.log(data);
+      res.status(200).json({
+        message: "Successfully retrieved group information",
+        data: { groups: data },
+      });
     })
     .catch((err) => {
       res
@@ -88,7 +93,6 @@ exports.displayGroups = (req, res) => {
         .send({ message: "Error retrieving transactions with id=" + id });
     });
 };
-
 exports.joinGroup = (req, res) => {
   const groupID = req.body.groupID;
   const username = req.body.username;
@@ -100,7 +104,7 @@ exports.joinGroup = (req, res) => {
       });
     } else if (!obj) {
       return res.status(500).json({
-        message: "No such account found.",
+        message: "No such group found.",
         data: {},
       });
     } else {
@@ -110,7 +114,7 @@ exports.joinGroup = (req, res) => {
         .save(obj)
         .then((groupInfo) => {
           return res.status(200).json({
-            message: "Account profile successfully updated.",
+            message: "Group joined successfully",
             data: { group: groupInfo },
           });
         })
@@ -123,3 +127,57 @@ exports.joinGroup = (req, res) => {
     }
   });
 };
+
+exports.initiatePayment = (req, res) => {
+  /*
+  const description = req.body.description;
+  const category = req.body.category;
+  const totalAmount = req.body.amount;
+
+  const groupID = req.body.groupID;
+  const userAmounts = req.body.userAmounts; //json of username, 
+
+  Group.findOne({ groupID: groupID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such group found.",
+        data: {},
+      });
+    } else {
+      // let newUser = { username: username, amount: 0 };
+      obj.log.push(userAmounts);
+      obj
+        .save(obj)
+        .then((groupInfo) => {
+          return res.status(200).json({
+            message: "Successfully initiated payment",
+            data: { group: groupInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });*/
+};
+
+exports.resetPayments = (req, res) => {};
+
+/* 
+This API changes the acknowledgement status of the transaction log from false to true,
+and simultaneously adds a new transaction in the users transaction log
+*/
+exports.acknowledgePayment = (req, res) => {};
+
+// Optional API to KIV
+exports.deleteMember = (req, res) => {};
+exports.updateGroup = (req, res) => {};
+exports.deleteGroup = (req, res) => {};
