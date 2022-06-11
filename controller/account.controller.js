@@ -163,7 +163,11 @@ exports.retrieveTransactions = (req, res) => {
     .then((data) => {
       if (!data)
         res.status(404).send({ message: "No user found with id " + id });
-      else res.send(data.transactions);
+      else
+        res.status(200).json({
+          message: "Retrieved Transactons",
+          data: data.transactions,
+        });
     })
     .catch((err) => {
       res
