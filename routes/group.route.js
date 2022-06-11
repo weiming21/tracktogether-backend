@@ -5,6 +5,7 @@ const auth = require("../controller/auth");
 
 router.post(
   "/",
+  auth,
   // AccountValidator.createAccount,
   // ErrorValidator.ifErrors,
   groupController.createGroup
@@ -12,6 +13,7 @@ router.post(
 
 router.put(
   "/",
+  auth,
   // AccountValidator.updateAccount,
   // ErrorValidator.ifErrors,
   groupController.updateGroup
@@ -19,7 +21,11 @@ router.put(
 
 router.get("/summary", auth, groupController.displayGroups);
 
-router.put("/join", groupController.joinGroup);
+router.put("/join", auth, groupController.joinGroup);
+
+router.put("/delete-member", groupController.deleteMember);
+
+router.put("/delete-group", groupController.deleteGroup);
 
 router.post(
   "/initiatePayment",
