@@ -78,7 +78,7 @@ exports.updateGroup = (req, res) => {
 };
 
 exports.displayGroups = (req, res) => {
-  const userID = req.body._id;
+  const userID = mongoose.Types.ObjectId(req.body._id);
   Group.find({ users: { $elemMatch: { _id: userID } } })
     .then((data) => {
       console.log(data);
