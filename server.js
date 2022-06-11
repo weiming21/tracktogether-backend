@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // const Account = require('./models/account.model.js');
 const db = require("./models");
-const Account = db.account;
+// const Account = db.account;
 
 const connectionParams = {
   useNewUrlParser: true,

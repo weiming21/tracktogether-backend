@@ -9,5 +9,6 @@ db.url = url;
 
 db.account = require("./account.model.js")(mongoose);
 db.group = require("./group.model.js")(mongoose);
+db.archive = require("./archive.model.js")(mongoose);
 
 module.exports = db;

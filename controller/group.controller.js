@@ -3,6 +3,7 @@ const db = require("../models");
 const env = require("../config/env");
 const HelperFunction = require("./helper.controller");
 const Group = db.group;
+const Archive = db.archive;
 const mongoose = require("mongoose");
 
 // const jwtSecret = env.jwtSecret;
@@ -169,20 +170,58 @@ exports.deleteMember = (req, res) => {
 
 exports.deleteGroup = (req, res) => {
   const groupID = req.body.groupID;
-  Group.deleteOne({ groupID: groupID })
-    .then((data) => {
-      console.log(data);
-      res.status(200).json({
-        message: "Successfully deleted group with id = " + groupID,
-        data: data,
+  Group.findOneAndDelete({ groupID: groupID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
       });
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .send({ message: "Error deleting group with id = " + groupID });
-    });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such group found.",
+        data: {},
+      });
+    } else {
+      //   return res.status(200).json({
+      //     message: "You have successfully deleted!",
+      //     data: { deleted: obj },
+      //   });
+      Archive.create({
+        groupID: obj.groupID,
+        name: obj.name,
+        image: obj.image,
+        users: obj.users,
+        log: obj.log,
+      })
+        .then((data) => {
+          return res.status(200).json({
+            message: "Successfully archived group with id = " + groupID,
+            data: { archive: data },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
 };
+//   })
+//     .then((data) => {
+//       console.log(data);
+//       res.status(200).json({
+//         message: "Successfully deleted group with id = " + groupID,
+//         data: data,
+//       });
+//     })
+//     .catch((err) => {
+//       res
+//         .status(500)
+//         .send({ message: "Error deleting group with id = " + groupID });
+//     });
+// };
 
 exports.initiatePayment = (req, res) => {
   /*
