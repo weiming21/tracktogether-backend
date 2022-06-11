@@ -78,8 +78,8 @@ exports.updateGroup = (req, res) => {
 };
 
 exports.displayGroups = (req, res) => {
-  const username = req.body.username;
-  Group.find({ users: { $elemMatch: { username: username } } })
+  const userID = req.body._id;
+  Group.find({ users: { $elemMatch: { _id: userID } } })
     .then((data) => {
       console.log(data);
       res.status(200).json({

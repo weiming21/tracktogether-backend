@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const accountController = require("../controller/account.controller.js");
 const auth = require("../controller/auth");
+const { get } = require("./group.route.js");
 
 router.post(
   "/",
@@ -29,12 +30,13 @@ router.post(
 
 router.put("/upload", auth, accountController.uploadImage);
 
-router.get("/:id", accountController.retrieveTransactions);
+router.get("/transactions", auth, accountController.retrieveTransactions);
 
 router.put(
-  "/:id",
+  "/transactions",
   // AccountValidator.login,
   // ErrorValidator.ifErrors,
+  auth,
   accountController.addTransactions
 );
 
