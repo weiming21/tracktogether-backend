@@ -158,8 +158,8 @@ exports.refresh = (req, res) => {
 };
 
 exports.retrieveTransactions = (req, res) => {
-  const id = req.params.id;
-  Account.findById(id)
+  const id = req.body._id;
+  Account.findOne({ _id: id })
     .then((data) => {
       if (!data)
         res.status(404).send({ message: "No user found with id " + id });
@@ -173,23 +173,9 @@ exports.retrieveTransactions = (req, res) => {
 };
 
 exports.addTransactions = (req, res) => {
-  const id = req.params.id;
-  const newData = req.body;
-
-  // Account.findOneAndUpdate( {_id: id},
-  //   { $push: {transactions: newData} } )
-  //   .then(data => {
-  //     if (!data)
-  //       res.status(404).send({ message: "No user found with id " + id });
-  //     else res.send(data.transactions);
-  //   })
-  //   .catch(err => {
-  //     res
-  //       .status(500)
-  //       .send({ message: "Error adding transactions with id=" + id });
-  //   });
-
-  var account = Account.findById(id, (err, obj) => {
+  const id = req.body._id;
+  const newData = req.body.data;
+  var account = Account.findOne({ _id: id }, (err, obj) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong! Error: " + err.message,

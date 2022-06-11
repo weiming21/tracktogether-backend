@@ -17,7 +17,7 @@ router.put(
   groupController.updateGroup
 );
 
-router.get("/summary/:username", groupController.displayGroups);
+router.get("/summary", auth, groupController.displayGroups);
 
 router.put("/join", groupController.joinGroup);
 
