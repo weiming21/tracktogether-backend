@@ -14,6 +14,7 @@ exports.createGroup = (req, res) => {
   const groupname = req.body.name;
   const userID = mongoose.Types.ObjectId(req.body._id);
   const username = req.body.username;
+  const contact = req.body.contact;
   Group.find()
     .sort({ groupID: -1 })
     .limit(1)
@@ -24,7 +25,12 @@ exports.createGroup = (req, res) => {
       const group = new Group({
         groupID: newID,
         name: groupname,
-        users: { userID: userID, username: username, amount: 0 },
+        users: {
+          userID: userID,
+          username: username,
+          contact: contact,
+          amount: 0,
+        },
       });
       group
         .save(group)
@@ -102,6 +108,7 @@ exports.joinGroup = (req, res) => {
   const groupID = req.body.groupID;
   const userID = mongoose.Types.ObjectId(req.body._id);
   const username = req.body.username;
+  const contact = req.body.contact;
   Group.findOne({ groupID: groupID }, (err, obj) => {
     if (err) {
       return res.status(500).json({
@@ -114,7 +121,12 @@ exports.joinGroup = (req, res) => {
         data: {},
       });
     } else {
-      let newUser = { userID: userID, username: username, amount: 0 };
+      let newUser = {
+        userID: userID,
+        username: username,
+        contact: contact,
+        amount: 0,
+      };
       obj.users.push(newUser);
       obj
         .save(obj)
