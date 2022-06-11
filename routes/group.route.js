@@ -23,9 +23,9 @@ router.get("/summary", auth, groupController.displayGroups);
 
 router.put("/join", auth, groupController.joinGroup);
 
-router.put("/delete-member", groupController.deleteMember);
+router.put("/delete-member", auth, groupController.deleteMember);
 
-router.put("/delete-group", groupController.deleteGroup);
+router.put("/delete-group", auth, groupController.deleteGroup);
 
 router.post(
   "/initiatePayment",

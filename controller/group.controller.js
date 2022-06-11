@@ -54,9 +54,9 @@ exports.createGroup = (req, res) => {
 };
 
 exports.updateGroup = (req, res) => {
-  let uniqueID = req.body._id;
+  const groupID = req.body.groupID;
 
-  var account = Group.findOne({ _id: uniqueID }, (err, obj) => {
+  var account = Group.findOne({ groupID: groupID }, (err, obj) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong! Error: " + err.message,
