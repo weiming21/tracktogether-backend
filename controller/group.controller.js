@@ -54,9 +54,9 @@ exports.createGroup = (req, res) => {
 };
 
 exports.updateGroup = (req, res) => {
-  let uniqueID = req.body._id;
+  const groupID = req.body.groupID;
 
-  var account = Group.findOne({ _id: uniqueID }, (err, obj) => {
+  var account = Group.findOne({ groupID: groupID }, (err, obj) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong! Error: " + err.message,
@@ -92,7 +92,7 @@ exports.displayGroups = (req, res) => {
   const userID = mongoose.Types.ObjectId(req.body._id);
   Group.find({ users: { $elemMatch: { userID: userID } } })
     .then((data) => {
-      console.log(data);
+      //   console.log(data);
       res.status(200).json({
         message: "Successfully retrieved group information",
         data: { groups: data },
@@ -155,7 +155,7 @@ exports.deleteMember = (req, res) => {
     { $pull: { users: { username: username } } }
   )
     .then((data) => {
-      console.log(data);
+      //   console.log(data);
       res.status(200).json({
         message: "Successfully deleted member named " + username,
         data: data,
@@ -208,30 +208,13 @@ exports.deleteGroup = (req, res) => {
     }
   });
 };
-//   })
-//     .then((data) => {
-//       console.log(data);
-//       res.status(200).json({
-//         message: "Successfully deleted group with id = " + groupID,
-//         data: data,
-//       });
-//     })
-//     .catch((err) => {
-//       res
-//         .status(500)
-//         .send({ message: "Error deleting group with id = " + groupID });
-//     });
-// };
 
+//insert the json objects of transaction logs into the "log" array
+//aggregate the amount of each user in the "users" array at the same time
 exports.initiatePayment = (req, res) => {
-  /*
-  const description = req.body.description;
-  const category = req.body.category;
-  const totalAmount = req.body.amount;
-
+  // an array of transaction logs initiated
   const groupID = req.body.groupID;
-  const userAmounts = req.body.userAmounts; //json of username, 
-
+  const userAmounts = req.body.userAmounts;
   Group.findOne({ groupID: groupID }, (err, obj) => {
     if (err) {
       return res.status(500).json({
@@ -244,8 +227,18 @@ exports.initiatePayment = (req, res) => {
         data: {},
       });
     } else {
-      // let newUser = { username: username, amount: 0 };
-      obj.log.push(userAmounts);
+      obj.log = obj.log.concat(userAmounts);
+      const temp = obj.users.concat(userAmounts);
+      const updatedUsers = temp.reduce((users, current) => {
+        if (users[current.username]) {
+          users[current.username].amount += current.amount;
+        } else {
+          users[current.username] = current;
+        }
+        return users;
+      }, {});
+      obj.users = [];
+      obj.users = obj.users.concat(Object.values(updatedUsers));
       obj
         .save(obj)
         .then((groupInfo) => {
@@ -261,17 +254,147 @@ exports.initiatePayment = (req, res) => {
           });
         });
     }
-  });*/
+  });
 };
 
-exports.resetPayments = (req, res) => {
-  // const groupID = req.body.groupID;
-  // Group.findOne({groupID: groupID})
-  // .then((obj) => )
+/*
+- I'm using username as a filter for now, if you want to use userID instead, 
+can just change accordingly (got two parts to change)
+- try on Insomnia first to see the intended output
+- the output log contains amount, category, date which are the only fields 
+I find relevant for our adjustment log. If you need more data just include 
+more fields within the "in" clause of the "$map" clause
+*/
+exports.getAdjustments = (req, res) => {
+  //   const userID = mongoose.Types.ObjectId(req.body._id);
+  const username = req.body.username;
+  Group.aggregate(
+    [
+      { $match: { log: { $elemMatch: { username: username } } } },
+      {
+        $project: {
+          groupID: 1,
+          name: 1,
+          log: {
+            $map: {
+              input: {
+                $filter: {
+                  input: "$log",
+                  as: "logFl",
+                  cond: { $eq: ["$$logFl.username", username] },
+                },
+              },
+              as: "logMap",
+              in: {
+                amount: "$$logMap.amount",
+                category: "$$logMap.category",
+                date: "$$logMap.date",
+              },
+            },
+          },
+        },
+      },
+    ],
+    (err, obj) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Something went wrong! Error: " + err.message,
+          data: {},
+        });
+      } else if (!obj) {
+        return res.status(500).json({
+          message: "No group transaction log for user with id = " + userID,
+          data: {},
+        });
+      } else {
+        return res.status(200).json({
+          message: "Successfully retrieved adjustments",
+          data: { adjustments: obj },
+        });
+      }
+    }
+  );
 };
 
 /* 
-This API changes the acknowledgement status of the transaction log from false to true,
-and simultaneously adds a new transaction in the users transaction log
+This API changes the acknowledgement status of the transaction log from false to true
 */
-exports.acknowledgePayment = (req, res) => {};
+/* 
+Here, I am using the entire json object of user log plus groupID as filters to update the 
+status (you might need to populate the missing fields in the outstanding group page) 
+As for displaying the group logs in outstanding, I think we can leverage the
+frontend groupCtx instead of creating a new api
+*/
+exports.acknowledgePayment = (req, res) => {
+  const groupID = req.body.groupID;
+  const userLog = req.body.userLog; //the group transaction log specific to the user
+  Group.updateOne(
+    { groupID: groupID },
+    { $set: { "log.$[elem].status": false } },
+    { arrayFilters: [{ elem: userLog }] },
+    (err, obj) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Something went wrong! Error: " + err.message,
+          data: {},
+        });
+      } else if (!obj) {
+        return res.status(500).json({
+          message: "No such transaction log found.",
+          data: {},
+        });
+      } else {
+        return res.status(200).json({
+          message: "Successfully updated status of user log",
+          data: { log: obj },
+        });
+      }
+    }
+  );
+};
+
+exports.resetPayments = (req, res) => {
+  const groupID = req.body.groupID;
+  Group.findOne({ groupID: groupID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such group found.",
+        data: {},
+      });
+    } else {
+      console.log(obj);
+      const temp = new Array(obj.users);
+      temp = temp.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
+      //   console.log(temp);
+      const amounts = temp.map((item) => item.amount);
+      const users = temp.map((item) => item.username);
+      //   console.log(amount);
+      const output = HelperFunction.getMinimumTransactions(amounts).map(
+        (item) => {
+          const obj = {};
+          obj["payer"] = users[item[0]];
+          obj["payee"] = users[item[1]];
+          obj["amount"] = item[2];
+          return obj;
+        }
+      );
+      return res
+        .status(200)
+        .json({
+          message: "Successfully initiated payment",
+          data: { payment: output },
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
+};

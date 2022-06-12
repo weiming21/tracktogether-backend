@@ -28,24 +28,26 @@ router.put("/delete-member", groupController.deleteMember);
 router.put("/delete-group", groupController.deleteGroup);
 
 router.post(
-  "/initiatePayment",
+  "/initiate-payment",
   // AccountValidator.updateAccount,
   // ErrorValidator.ifErrors,
   groupController.initiatePayment
 );
 
 router.post(
-  "/resetPayment",
+  "/reset-payment",
   // AccountValidator.updateAccount,
   // ErrorValidator.ifErrors,
   groupController.resetPayments
 );
 
-router.post(
-  "/acknowledgePayment",
+router.get(
+  "/adjustments",
   // AccountValidator.updateAccount,
   // ErrorValidator.ifErrors,
-  groupController.acknowledgePayment
+  groupController.getAdjustments
 );
+
+router.put("/acknowledge", groupController.acknowledgePayment);
 
 module.exports = router;
