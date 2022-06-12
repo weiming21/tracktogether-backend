@@ -368,12 +368,12 @@ exports.resetPayments = (req, res) => {
       });
     } else {
       console.log(obj);
-      const temp = new Array(obj.users);
+      let temp = [].concat(obj.users);
       temp = temp.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
-      //   console.log(temp);
+      console.log(temp);
       const amounts = temp.map((item) => item.amount);
       const users = temp.map((item) => item.username);
-      //   console.log(amount);
+      console.log(amounts);
       const output = HelperFunction.getMinimumTransactions(amounts).map(
         (item) => {
           const obj = {};
