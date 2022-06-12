@@ -209,3 +209,52 @@ exports.addTransactions = (req, res) => {
     }
   });
 };
+
+exports.getAlerts = (req, res) => {
+  const id = req.body._id;
+  Account.findOne({ _id: id }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such user found.",
+        data: {},
+      });
+    } else {
+      // console.log(obj);
+      return res.status(200).json({
+        message: "Successfully retrieved user's pending payments.",
+        data: { pending: obj.pending },
+      });
+    }
+  });
+};
+
+// This might be problematic if there are duplicate alerts in the pending array of user
+// might consider adding a date field in the alert but this needs to be cascaded down
+// from the resetPayment function
+exports.clearAlerts = (req, res) => {
+  const id = req.body._id;
+  const alert = req.body.alert;
+  Account.updateOne({ _id: id }, { $pull: { pending: alert } }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such user found.",
+        data: {},
+      });
+    } else {
+      return res.status(200).json({
+        message: "Successfully cleared user's pending payments.",
+        data: obj,
+      });
+    }
+  });
+};

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const accountController = require("../controller/account.controller.js");
 const auth = require("../controller/auth");
+const { account } = require("../models/index.js");
 const { get } = require("./group.route.js");
 
 router.post(
@@ -39,5 +40,9 @@ router.put(
   auth,
   accountController.addTransactions
 );
+
+router.get("/alerts", accountController.getAlerts);
+
+router.put("/alerts", accountController.clearAlerts);
 
 module.exports = router;

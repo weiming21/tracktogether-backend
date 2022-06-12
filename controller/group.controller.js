@@ -4,6 +4,7 @@ const env = require("../config/env");
 const HelperFunction = require("./helper.controller");
 const Group = db.group;
 const Archive = db.archive;
+const Account = db.account;
 const mongoose = require("mongoose");
 
 // const jwtSecret = env.jwtSecret;
@@ -367,34 +368,55 @@ exports.resetPayments = (req, res) => {
         data: {},
       });
     } else {
-      console.log(obj);
+      //   console.log(obj);
       let temp = [].concat(obj.users);
       temp = temp.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
-      console.log(temp);
+      //   console.log(temp);
       const amounts = temp.map((item) => item.amount);
-      const users = temp.map((item) => item.username);
-      console.log(amounts);
+      const users = temp.map((item) => [item.username, item.contact]);
       const output = HelperFunction.getMinimumTransactions(amounts).map(
         (item) => {
           const obj = {};
           obj["payer"] = users[item[0]];
-          obj["payee"] = users[item[1]];
+          obj["payee"] = users[item[1]][0];
+          obj["contact"] = users[item[1]][1];
           obj["amount"] = item[2];
           return obj;
         }
       );
-      return res
-        .status(200)
-        .json({
-          message: "Successfully initiated payment",
-          data: { payment: output },
-        })
-        .catch((err) => {
-          return res.status(500).json({
-            message: "Something went wrong! Error: " + err.message,
-            data: {},
-          });
-        });
+      //   console.log(output);
+      //   let modifiedDocuments = 0;
+      output.forEach((item) => {
+        Account.updateOne(
+          { username: item.payer },
+          {
+            $push: {
+              pending: {
+                group: groupID,
+                payee: item.payee,
+                contact: item.contact,
+                amount: item.amount,
+              },
+            },
+          },
+          (err, obj) => {
+            if (err) {
+              return res.status(500).json({
+                message:
+                  "Something went wrong when updating user's pending payment! Error: " +
+                  err.message,
+                data: {},
+              });
+            } else {
+              console.log(obj);
+            }
+          }
+        );
+      });
+      return res.status(200).json({
+        message:
+          "Successfully resetted payments and updated respective user pending payments",
+      });
     }
   });
 };
