@@ -1,5 +1,27 @@
 function getMinimumTransactions(debt) {
   //Returns [arrayOfTransactions];
+
+  console.log(debt);
+
+  // debt = debt.map((number) => {
+  //   Number(number).toFixed(2)
+  // });
+
+  let total = 0;
+
+  for (let i = 0; i < debt.length; i++) {
+    if (i === debt.length - 1) {
+      debt[i] = 0 - Number(total);
+    } else {
+      debt[i] = debt[i];
+      total += debt[i];
+    }
+    console.log(total);
+    console.log(debt);
+  }
+
+  console.log(debt);
+
   function helper(curr, debt, transactions) {
     while (curr < debt.length && debt[curr] === 0) {
       curr++;

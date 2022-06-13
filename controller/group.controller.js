@@ -215,6 +215,11 @@ exports.initiatePayment = (req, res) => {
   // an array of transaction logs initiated
   const groupID = req.body.groupID;
   const userAmounts = req.body.userAmounts;
+
+  userAmounts.forEach((user) => {
+    user.userID = mongoose.Types.ObjectId(user.userID);
+  });
+
   Group.findOne({ groupID: groupID }, (err, obj) => {
     if (err) {
       return res.status(500).json({
@@ -374,20 +379,20 @@ exports.resetPayments = (req, res) => {
       const amounts = temp.map((item) => item.amount);
       const users = temp.map((item) => item.username);
       console.log(amounts);
-      const output = HelperFunction.getMinimumTransactions(amounts).map(
-        (item) => {
-          const obj = {};
-          obj["payer"] = users[item[0]];
-          obj["payee"] = users[item[1]];
-          obj["amount"] = item[2];
-          return obj;
-        }
-      );
+      const output = HelperFunction.getMinimumTransactions(amounts);
+      console.log(output);
+      const output2 = output.map((item) => {
+        const obj = {};
+        obj["payer"] = users[item[0]];
+        obj["payee"] = users[item[1]];
+        obj["amount"] = item[2];
+        return obj;
+      });
       return res
         .status(200)
         .json({
           message: "Successfully initiated payment",
-          data: { payment: output },
+          data: { payment: output2 },
         })
         .catch((err) => {
           return res.status(500).json({
