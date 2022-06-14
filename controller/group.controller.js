@@ -216,6 +216,11 @@ exports.initiatePayment = (req, res) => {
   // an array of transaction logs initiated
   const groupID = req.body.groupID;
   const userAmounts = req.body.userAmounts;
+
+  userAmounts.forEach((user) => {
+    user.userID = mongoose.Types.ObjectId(user.userID);
+  });
+
   Group.findOne({ groupID: groupID }, (err, obj) => {
     if (err) {
       return res.status(500).json({
