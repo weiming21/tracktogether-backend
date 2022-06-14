@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require("path");
 // const fileUpload = require('express-fileupload');
 
 const apiRouter = require("./routes/api.routes");
@@ -36,7 +37,7 @@ app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-// app.get('/api', )
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.listen(8080, () => {
   console.log("Server started on port 8080...");
