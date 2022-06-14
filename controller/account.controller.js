@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
 const env = require("../config/env");
+const multer = require("multer");
 const Account = db.account;
 
 const jwtSecret = env.jwtSecret;
@@ -121,7 +122,7 @@ exports.uploadImage = (req, res) => {
         data: {},
       });
     } else {
-      obj.image = req.body.image;
+      obj.image = req.file.filename;
       obj
         .save(obj)
         .then((accountInfo) => {
