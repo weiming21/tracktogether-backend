@@ -8,6 +8,7 @@ module.exports = (mongoose) => {
       image: String,
       transactions: Array,
       pending: Array,
+      groupLog: Array,
     },
     { timestamps: true }
   );

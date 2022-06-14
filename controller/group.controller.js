@@ -233,7 +233,45 @@ exports.initiatePayment = (req, res) => {
         data: {},
       });
     } else {
+      /*looping through each user and finding the respective user document in users
+      collection to push the corresponding group transaction log into groupLog*/
+      userAmounts.forEach((user) => {
+        Account.findOne({ username: user.username }, (err, obj) => {
+          if (err) {
+            return res.status(500).json({
+              message: "Something went wrong! Error: " + err.message,
+              data: {},
+            });
+          } else if (!obj) {
+            return res.status(500).json({
+              message: "No such user found.",
+              data: {},
+            });
+          } else {
+            obj.log.push({
+              groupID: parseInt(groupID),
+              description: user.description,
+              category: user.category,
+              amount: user.amount,
+              date: user.date,
+            });
+            obj
+              .save(obj)
+              .then((userInfo) => {
+                // console.log(userInfo);
+              })
+              .catch((err) => {
+                return res.status(500).json({
+                  message: "Something went wrong! Error: " + err.message,
+                  data: {},
+                });
+              });
+          }
+        });
+      });
+      //saving the array of transaction logs into the log array of group
       obj.log = obj.log.concat(userAmounts);
+      //aggregate the overall balance of each user in users array of group
       const temp = obj.users.concat(userAmounts);
       const updatedUsers = temp.reduce((users, current) => {
         if (users[current.username]) {
@@ -263,14 +301,14 @@ exports.initiatePayment = (req, res) => {
   });
 };
 
-/*
+/* 
 - I'm using username as a filter for now, if you want to use userID instead, 
 can just change accordingly (got two parts to change)
 - try on Insomnia first to see the intended output
 - the output log contains amount, category, date which are the only fields 
 I find relevant for our adjustment log. If you need more data just include 
 more fields within the "in" clause of the "$map" clause
-*/
+
 exports.getAdjustments = (req, res) => {
   //   const userID = mongoose.Types.ObjectId(req.body._id);
   const username = req.body.username;
@@ -321,6 +359,7 @@ exports.getAdjustments = (req, res) => {
     }
   );
 };
+*/
 
 /* 
 This API changes the acknowledgement status of the transaction log from false to true
@@ -382,15 +421,14 @@ exports.resetPayments = (req, res) => {
       const output = HelperFunction.getMinimumTransactions(amounts).map(
         (item) => {
           const obj = {};
-          obj["payer"] = users[item[0]];
+          obj["payer"] = users[item[0]][0];
+          obj["payer_contact"] = users[item[0]][1];
           obj["payee"] = users[item[1]][0];
-          obj["contact"] = users[item[1]][1];
+          obj["payee_contact"] = users[item[1]][1];
           obj["amount"] = item[2];
           return obj;
         }
       );
-      //   console.log(output);
-      //   let modifiedDocuments = 0;
       output.forEach((item) => {
         Account.updateOne(
           { username: item.payer },
@@ -398,13 +436,13 @@ exports.resetPayments = (req, res) => {
             $push: {
               pending: {
                 group: groupID,
-                payee: item.payee,
-                contact: item.contact,
+                user: item.payee,
+                contact: item.payee_contact,
                 amount: item.amount,
               },
             },
           },
-          (err, obj) => {
+          (err) => {
             if (err) {
               return res.status(500).json({
                 message:
@@ -412,16 +450,56 @@ exports.resetPayments = (req, res) => {
                   err.message,
                 data: {},
               });
-            } else {
-              console.log(obj);
+            }
+          }
+        );
+        Account.updateOne(
+          { username: item.payee },
+          {
+            $push: {
+              pending: {
+                group: groupID,
+                user: item.payer,
+                contact: item.payer_contact,
+                amount: item.amount * -1,
+              },
+            },
+          },
+          (err) => {
+            if (err) {
+              return res.status(500).json({
+                message:
+                  "Something went wrong when updating user's pending payment! Error: " +
+                  err.message,
+                data: {},
+              });
             }
           }
         );
       });
-      return res.status(200).json({
-        message:
-          "Successfully resetted payments and updated respective user pending payments",
+
+      obj.log = [];
+      obj.users = obj.users.map((user) => {
+        const json = {
+          ...user,
+        };
+        json.amount = 0;
+        return json;
       });
+      obj
+        .save(obj)
+        .then((groupInfo) => {
+          return res.status(200).json({
+            message: "Successfully resetted payment",
+            data: { group: groupInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
     }
   });
 };

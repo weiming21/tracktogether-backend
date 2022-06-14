@@ -41,12 +41,12 @@ router.post(
   groupController.resetPayments
 );
 
-router.get(
-  "/adjustments",
-  // AccountValidator.updateAccount,
-  // ErrorValidator.ifErrors,
-  groupController.getAdjustments
-);
+// router.get(
+//   "/adjustments",
+//   // AccountValidator.updateAccount,
+//   // ErrorValidator.ifErrors,
+//   groupController.getAdjustments
+// );
 
 router.put("/acknowledge", groupController.acknowledgePayment);
 
