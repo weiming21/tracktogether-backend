@@ -248,7 +248,7 @@ exports.initiatePayment = (req, res) => {
               data: {},
             });
           } else {
-            obj.log.push({
+            obj.groupLog.push({
               groupID: parseInt(groupID),
               description: user.description,
               category: user.category,
@@ -373,29 +373,42 @@ frontend groupCtx instead of creating a new api
 exports.acknowledgePayment = (req, res) => {
   const groupID = req.body.groupID;
   const userLog = req.body.userLog; //the group transaction log specific to the user
-  Group.updateOne(
-    { groupID: groupID },
-    { $set: { "log.$[elem].status": false } },
-    { arrayFilters: [{ elem: userLog }] },
-    (err, obj) => {
-      if (err) {
-        return res.status(500).json({
-          message: "Something went wrong! Error: " + err.message,
-          data: {},
-        });
-      } else if (!obj) {
-        return res.status(500).json({
-          message: "No such transaction log found.",
-          data: {},
-        });
-      } else {
-        return res.status(200).json({
-          message: "Successfully updated status of user log",
-          data: { log: obj },
-        });
-      }
+  const json = {
+    ...userLog,
+  };
+  json.userID = mongoose.Types.ObjectId(json.userID);
+  Group.findOne({ groupID: groupID, log: json }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(200).json({
+        message: "No such transaction log found",
+        data: {},
+      });
+    } else {
+      Group.updateOne(
+        { groupID: groupID },
+        { $set: { "log.$[elem].status": true } },
+        { arrayFilters: [{ elem: json }] },
+        (err, obj) => {
+          if (err) {
+            return res.status(500).json({
+              message: "Something went wrong! Error: " + err.message,
+              data: {},
+            });
+          } else {
+            return res.status(200).json({
+              message: "Successfully updated status of user log",
+              data: { log: obj },
+            });
+          }
+        }
+      );
     }
-  );
+  });
 };
 
 exports.resetPayments = (req, res) => {
