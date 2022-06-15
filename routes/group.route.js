@@ -36,6 +36,7 @@ router.post(
 
 router.post(
   "/reset-payment",
+  auth,
   // AccountValidator.updateAccount,
   // ErrorValidator.ifErrors,
   groupController.resetPayments
@@ -48,6 +49,6 @@ router.post(
 //   groupController.getAdjustments
 // );
 
-router.put("/acknowledge", groupController.acknowledgePayment);
+router.put("/acknowledge", auth, groupController.acknowledgePayment);
 
 module.exports = router;
