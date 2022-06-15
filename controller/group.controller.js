@@ -248,7 +248,7 @@ exports.initiatePayment = (req, res) => {
               data: {},
             });
           } else {
-            obj.log.push({
+            obj.groupLog.push({
               groupID: parseInt(groupID),
               description: user.description,
               category: user.category,
