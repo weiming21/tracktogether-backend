@@ -1,27 +1,23 @@
 function getMinimumTransactions(debt) {
   //Returns [arrayOfTransactions];
+  let newDebt = [...debt];
 
-  console.log(debt);
-
-  // debt = debt.map((number) => {
-  //   Number(number).toFixed(2)
-  // });
+  newDebt = newDebt.map((number) => {
+    // We are multplying the number by 100 so that it can be round to 2 decimal places.
+    return Math.round(100 * number);
+  });
 
   let total = 0;
 
-  for (let i = 0; i < debt.length; i++) {
-    if (i === debt.length - 1) {
-      debt[i] = 0 - Number(total);
+  for (let i = 0; i < newDebt.length; i++) {
+    if (i === newDebt.length - 1) {
+      newDebt[i] = -total;
     } else {
-      debt[i] = debt[i];
-      total += debt[i];
+      total += newDebt[i];
     }
-    console.log(total);
-    console.log(debt);
   }
 
-  console.log(debt);
-
+  // Function only works with debts of integers.
   function helper(curr, debt, transactions) {
     while (curr < debt.length && debt[curr] === 0) {
       curr++;
@@ -61,25 +57,18 @@ function getMinimumTransactions(debt) {
     return minTransactions;
   }
 
-  let result = helper(0, debt, []);
+  let result = helper(0, newDebt, []);
+
+  // We are dividing the amount here by 100, as 100 was multiplied to the amount initially.
   result = result.map((entry) => {
     if (entry[2] < 0) {
-      return [entry[1], entry[0], -entry[2]];
+      return [entry[1], entry[0], -entry[2] / 100];
     } else {
-      return entry;
+      return [entry[0], entry[1], entry[2] / 100];
     }
   });
 
   return result;
 }
-
-// const testCase1 = [3, -65, 2, 76, 33, -49];
-// console.log(getMinimumTransactions(testCase1));
-
-// const testCase2 = [2, 2, 5, 7, -12, -4];
-// console.log(getMinimumTransactions(testCase2));
-
-// const testCase3 = [2, 2, 5, 7, -12, -4];
-// console.log(getMinimumTransactions(testCase3));
 
 exports.getMinimumTransactions = getMinimumTransactions;
