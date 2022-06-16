@@ -259,3 +259,26 @@ exports.clearAlerts = (req, res) => {
     }
   });
 };
+
+exports.getAdjustments = (req, res) => {
+  const id = req.body._id;
+  Account.findOne({ _id: id }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such user found.",
+        data: {},
+      });
+    } else {
+      // console.log(obj);
+      return res.status(200).json({
+        message: "Successfully retrieved user's pending payments.",
+        data: { adjustments: obj.groupLog },
+      });
+    }
+  });
+};

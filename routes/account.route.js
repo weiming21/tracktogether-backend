@@ -79,8 +79,10 @@ router.put(
   accountController.addTransactions
 );
 
-router.get("/alerts", accountController.getAlerts);
+router.get("/alerts", auth, accountController.getAlerts);
 
 router.put("/alerts", accountController.clearAlerts);
+
+router.get("/adjustment", auth, accountController.getAdjustments);
 
 module.exports = router;
