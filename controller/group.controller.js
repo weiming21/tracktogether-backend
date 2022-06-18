@@ -89,6 +89,77 @@ exports.updateGroup = (req, res) => {
   });
 };
 
+exports.uploadImage = (req, res) => {
+  // console.log(req);
+  console.log(req.file.filename);
+  console.log(req.body.groupID);
+  let groupID = parseInt(req.body.groupID);
+  const url = req.protocol + "://" + req.get("host");
+
+  var account = Group.findOne({ groupID: groupID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such account found.",
+        data: {},
+      });
+    } else {
+      obj.image = url + "/public/" + req.file.filename;
+      obj
+        .save(obj)
+        .then((accountInfo) => {
+          return res.status(200).json({
+            message: "Image successfully uploaded/changed.",
+            data: { account: accountInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
+};
+
+exports.removeImage = (req, res) => {
+  const groupID = req.body.groupID;
+  var account = Group.findOne({ groupID: groupID }, (err, obj) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong! Error: " + err.message,
+        data: {},
+      });
+    } else if (!obj) {
+      return res.status(500).json({
+        message: "No such account found.",
+        data: {},
+      });
+    } else {
+      obj.image = "";
+      obj
+        .save(obj)
+        .then((accountInfo) => {
+          return res.status(200).json({
+            message: "Image successfully removed.",
+            data: { account: accountInfo },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
+    }
+  });
+};
+
 exports.displayGroups = (req, res) => {
   const userID = mongoose.Types.ObjectId(req.body._id);
   Group.find({ users: { $elemMatch: { userID: userID } } })
