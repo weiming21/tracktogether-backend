@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const groupController = require("../controller/group.controller.js");
 const auth = require("../controller/auth");
+const { upload } = require("../helpers/filehelper");
 
 router.post(
   "/",
@@ -18,6 +19,10 @@ router.put(
   // ErrorValidator.ifErrors,
   groupController.updateGroup
 );
+
+router.put("/upload", auth, upload, groupController.uploadImage);
+
+router.delete("/remove", auth, groupController.removeImage);
 
 router.get("/summary", auth, groupController.displayGroups);
 

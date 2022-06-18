@@ -35,39 +35,9 @@ router.post(
 
 // router.put("/upload", auth, upload, accountController.uploadImage);
 
-// router.put("/upload", auth, upload, (req, res, next) => {
-//   let uniqueID = req.body._id;
+router.put("/upload", auth, upload, accountController.uploadImage);
 
-//   var account = Account.findOne({ _id: uniqueID }, (err, obj) => {
-//     if (err) {
-//       return res.status(500).json({
-//         message: "Something went wrong! Error: " + err.message,
-//         data: {},
-//       });
-//     } else if (!obj) {
-//       return res.status(500).json({
-//         message: "No such account found.",
-//         data: {},
-//       });
-//     } else {
-//       obj.image = req.file;
-//       obj
-//         .save(obj)
-//         .then((accountInfo) => {
-//           return res.status(200).json({
-//             message: "Image successfully uploaded/changed.",
-//             data: { account: accountInfo },
-//           });
-//         })
-//         .catch((err) => {
-//           return res.status(500).json({
-//             message: "Something went wrong! Error: " + err.message,
-//             data: {},
-//           });
-//         });
-//     }
-//   });
-// });
+router.delete("/remove", auth, accountController.removeImage);
 
 router.get("/transactions", auth, accountController.retrieveTransactions);
 

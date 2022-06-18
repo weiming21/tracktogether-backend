@@ -1,6 +1,6 @@
 const e = require("express");
 const multer = require("multer");
-const uuid = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 
 const DIR = "./public/";
 
@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const fileName = file.originalname.toLowerCase().split(" ").join("-");
-    cb(null, uuid() + "-" + fileName + "-" + Date.now());
+    cb(null, uuidv4() + "-" + Date.now() + "-" + fileName);
   },
 });
 
@@ -28,6 +28,6 @@ const upload = multer({
       return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
     }
   },
-}).single("file");
+}).single("image");
 
 module.exports = { upload };
