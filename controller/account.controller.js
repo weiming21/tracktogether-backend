@@ -278,22 +278,105 @@ exports.getAlerts = (req, res) => {
 exports.clearAlerts = (req, res) => {
   const id = req.body._id;
   const alert = req.body.alert;
-  Account.updateOne({ _id: id }, { $pull: { pending: alert } }, (err, obj) => {
+  const payeeUsername = alert.user;
+  const groupID = alert.group;
+  const payerUsername = req.body.username;
+  const mirroredAmount = alert.amount * -1;
+
+  Account.findOne({ _id: id }, (err, firstObj) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong! Error: " + err.message,
         data: {},
       });
-    } else if (!obj) {
+    } else if (!firstObj) {
       return res.status(500).json({
         message: "No such user found.",
         data: {},
       });
     } else {
-      return res.status(200).json({
-        message: "Successfully cleared user's pending payments.",
-        data: obj,
+      let tempArray = [].concat(firstObj.pending);
+      let matchingIndex = null;
+      tempArray.forEach((entry, index) => {
+        if (
+          entry.group.toString() === groupID.toString() &&
+          entry.amount === alert.amount &&
+          entry.user === payeeUsername
+        ) {
+          matchingIndex = index;
+        }
       });
+
+      tempArray = tempArray.filter((entry, index) => {
+        return entry != null && index !== matchingIndex;
+      });
+
+      firstObj.pending = [];
+      firstObj.pending = tempArray;
+
+      firstObj
+        .save(firstObj)
+        .then(() => {
+          // truthy = false;
+          console.log("iam here");
+          if (alert.amount > 0) {
+            console.log("iam but deeper");
+            Account.findOne({ username: payeeUsername }, (err, obj) => {
+              if (err) {
+                return res.status(500).json({
+                  message: "Something went wrong! Error: " + err.message,
+                  data: {},
+                });
+              } else if (!obj) {
+                return res.status(500).json({
+                  message: "Payee username not found.",
+                  data: {},
+                });
+              } else {
+                let tempArray = [].concat(obj.pending);
+                let matchingIndex = null;
+                tempArray.forEach((entry, index) => {
+                  if (
+                    entry.group.toString() === groupID.toString() &&
+                    entry.amount === mirroredAmount &&
+                    entry.user === payerUsername
+                  ) {
+                    matchingIndex = index;
+                  }
+                });
+
+                tempArray[matchingIndex].payeeHasPaid = true;
+
+                obj.pending = [];
+                obj.pending = tempArray;
+
+                obj
+                  .save(obj)
+                  .then(() => {
+                    truthy = true;
+                  })
+                  .catch((err) => {
+                    return res.status(500).json({
+                      message: "Something went wrong! Error: " + err.message,
+                      data: {},
+                    });
+                  });
+              }
+            });
+          }
+        })
+        .then(() => {
+          return res.status(200).json({
+            message: "Successfully cleared user's pending payments.",
+            data: { firstObj },
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "Something went wrong! Error: " + err.message,
+            data: {},
+          });
+        });
     }
   });
 };

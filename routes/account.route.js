@@ -51,7 +51,7 @@ router.put(
 
 router.get("/alerts", auth, accountController.getAlerts);
 
-router.put("/alerts", accountController.clearAlerts);
+router.put("/alerts", auth, accountController.clearAlerts);
 
 router.get("/adjustment", auth, accountController.getAdjustments);
 
