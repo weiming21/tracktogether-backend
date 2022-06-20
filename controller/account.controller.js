@@ -197,6 +197,7 @@ exports.refresh = (req, res) => {
 };
 
 exports.retrieveTransactions = (req, res) => {
+  // console.log("getting transactions" + new Date());
   const id = req.body._id;
   Account.findOne({ _id: id })
     .then((data) => {
@@ -278,9 +279,10 @@ exports.getAlerts = (req, res) => {
 exports.clearAlerts = (req, res) => {
   const id = req.body._id;
   const alert = req.body.alert;
+  const payerUsername = req.body.username;
+
   const payeeUsername = alert.user;
   const groupID = alert.group;
-  const payerUsername = req.body.username;
   const mirroredAmount = alert.amount * -1;
 
   Account.findOne({ _id: id }, (err, firstObj) => {
@@ -353,7 +355,10 @@ exports.clearAlerts = (req, res) => {
                 obj
                   .save(obj)
                   .then(() => {
-                    truthy = true;
+                    return res.status(200).json({
+                      message: "Successfully cleared user's pending payments.",
+                      data: { obj },
+                    });
                   })
                   .catch((err) => {
                     return res.status(500).json({
@@ -363,14 +368,14 @@ exports.clearAlerts = (req, res) => {
                   });
               }
             });
+          } else {
+            return res.status(200).json({
+              message: "Successfully cleared user's pending payments.",
+              data: { firstObj },
+            });
           }
         })
-        .then(() => {
-          return res.status(200).json({
-            message: "Successfully cleared user's pending payments.",
-            data: { firstObj },
-          });
-        })
+
         .catch((err) => {
           return res.status(500).json({
             message: "Something went wrong! Error: " + err.message,
