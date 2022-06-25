@@ -33,7 +33,7 @@ router.post(
   accountController.login
 );
 
-// router.put("/upload", auth, upload, accountController.uploadImage);
+router.get("/quote", auth, accountController.fetchQuote);
 
 router.put("/upload", auth, upload, accountController.uploadImage);
 

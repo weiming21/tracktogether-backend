@@ -4,6 +4,7 @@ const env = require("../config/env");
 const multer = require("multer");
 const Account = db.account;
 const mongoose = require("mongoose");
+const quotes = require("../helpers/quotes.json");
 
 const jwtSecret = env.jwtSecret;
 function createToken(id, email) {
@@ -106,6 +107,13 @@ exports.login = (req, res) => {
       }
     }
   );
+};
+
+exports.fetchQuote = async (req, res) => {
+  return res.status(200).json({
+    message: "Quote fetched successfully",
+    data: quotes,
+  });
 };
 
 exports.uploadImage = (req, res) => {
