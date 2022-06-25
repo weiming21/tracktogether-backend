@@ -34,7 +34,7 @@ db.mongoose
 
 app.use("/api", apiRouter);
 
-app.get("/", (req, res) => {
+app.get("/api/hello", (req, res) => {
   res.send("Hello world");
 });
 
