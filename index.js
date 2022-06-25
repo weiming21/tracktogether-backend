@@ -15,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // const Account = require('./models/account.model.js');
 const db = require("./models");
 // const Account = db.account;
+const port = process.env.PORT || 8080;
 
 const connectionParams = {
   useNewUrlParser: true,
@@ -39,6 +40,8 @@ app.get("/", (req, res) => {
 
 app.use("/public", express.static(path.join(__dirname, "public")));
 
-app.listen(8080, () => {
-  console.log("Server started on port 8080...");
+
+
+app.listen(port, () => {
+  console.log(`Server started on ${port}...`);
 });
