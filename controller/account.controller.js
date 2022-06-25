@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
-const env = require("../config/env");
+// const env = require("../config/env");
 const multer = require("multer");
 const Account = db.account;
 const mongoose = require("mongoose");
 const quotes = require("../helpers/quotes.json");
+require("dotenv").config();
 
-const jwtSecret = env.jwtSecret;
+const jwtSecret = process.env.JWT_SECRET;
 function createToken(id, email) {
   return jwt.sign({ id: id, email: email }, jwtSecret);
 }
@@ -328,9 +329,9 @@ exports.clearAlerts = (req, res) => {
         .save(firstObj)
         .then(() => {
           // truthy = false;
-          console.log("iam here");
+          // console.log("iam here");
           if (alert.amount > 0) {
-            console.log("iam but deeper");
+            // console.log("iam but deeper");
             Account.findOne({ username: payeeUsername }, (err, obj) => {
               if (err) {
                 return res.status(500).json({

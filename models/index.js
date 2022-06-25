@@ -1,5 +1,7 @@
-const env = require("../config/env");
-const url = env.dbLink;
+// const env = require("../config/env");
+// const url = env.dbLink;
+require("dotenv").config();
+const url = process.env.DB_LINK
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 

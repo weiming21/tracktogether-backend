@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
-const env = require("../config/env");
+// const env = require("../config/env");
 const HelperFunction = require("./helper.controller");
 const Group = db.group;
 const Archive = db.archive;
